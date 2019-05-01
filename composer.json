@@ -1,6 +1,6 @@
 {
     "name": "slepic/http-transfer",
-    "description": "",
+    "description": "Simple PHP library working with PSR HTTP message transfers.",
     "type": "library",
     "require": {
         "php": "^5.6 || ^7.0",
