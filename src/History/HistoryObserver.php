@@ -16,31 +16,31 @@ use Slepic\Http\Transfer\Observer\ObserverInterface;
  */
 final class HistoryObserver implements ObserverInterface
 {
-	/**
-	 * @var StorageInterface
-	 */
-	private $storage;
+    /**
+     * @var StorageInterface
+     */
+    private $storage;
 
-	/**
-	 * HistoryObserver constructor.
-	 * @param StorageInterface $storage
-	 */
-	public function __construct(StorageInterface $storage)
-	{
-		$this->storage = $storage;
-	}
+    /**
+     * HistoryObserver constructor.
+     * @param StorageInterface $storage
+     */
+    public function __construct(StorageInterface $storage)
+    {
+        $this->storage = $storage;
+    }
 
-	/**
-	 * @param RequestInterface $request
-	 * @param array $context
-	 * @return ObserverDelegateInterface
-	 */
-	public function observe(RequestInterface $request, array $context = [])
-	{
-		return new HistoryObserverDelegate(
-			$this->storage,
-			$request,
-			$context
-		);
-	}
+    /**
+     * @param RequestInterface $request
+     * @param array $context
+     * @return ObserverDelegateInterface
+     */
+    public function observe(RequestInterface $request, array $context = [])
+    {
+        return new HistoryObserverDelegate(
+            $this->storage,
+            $request,
+            $context
+        );
+    }
 }

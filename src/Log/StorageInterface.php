@@ -11,9 +11,9 @@ namespace Slepic\Http\Transfer\Log;
  */
 interface StorageInterface
 {
-	/**
-	 * @param LogInterface $log
-	 * @return void
-	 */
-	public function store(LogInterface $log);
+    /**
+     * @param LogInterface $log
+     * @return void
+     */
+    public function store(LogInterface $log);
 }
