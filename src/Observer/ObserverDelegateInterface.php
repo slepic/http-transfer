@@ -17,20 +17,20 @@ use Psr\Http\Message\ResponseInterface;
  */
 interface ObserverDelegateInterface
 {
-	/**
-	 * Observe successful completion of the transfer process.
-	 *
-	 * @param ResponseInterface $response
-	 * @return void
-	 */
-	public function success(ResponseInterface $response);
+    /**
+     * Observe successful completion of the transfer process.
+     *
+     * @param ResponseInterface $response
+     * @return void
+     */
+    public function success(ResponseInterface $response);
 
-	/**
-	 * Observe unsuccessful completion of the transfer process.
-	 *
-	 * @param \Exception $exception
-	 * @param ResponseInterface|null $response
-	 * @return void
-	 */
-	public function error(\Exception $exception, ResponseInterface $response = null);
+    /**
+     * Observe unsuccessful completion of the transfer process.
+     *
+     * @param \Exception $exception
+     * @param ResponseInterface|null $response
+     * @return void
+     */
+    public function error(\Exception $exception, ResponseInterface $response = null);
 }

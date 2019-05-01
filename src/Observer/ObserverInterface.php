@@ -15,10 +15,10 @@ use Psr\Http\Message\RequestInterface;
  */
 interface ObserverInterface
 {
-	/**
-	 * @param RequestInterface $request
-	 * @param array $context
-	 * @return ObserverDelegateInterface
-	 */
-	public function observe(RequestInterface $request, array $context = []);
+    /**
+     * @param RequestInterface $request
+     * @param array $context
+     * @return ObserverDelegateInterface
+     */
+    public function observe(RequestInterface $request, array $context = []);
 }
