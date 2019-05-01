@@ -18,6 +18,14 @@
             "email": "gslepic@gmail.com"
         }
     ],
+    "provide": {
+        "slepic/http-transfer-observer-implementation": "*"
+    },
+    "suggest": {
+        "slepic/http-transfer-observer-consumer": "See observer consumers, possibly adapters of various http clients.",
+        "slepic/http-transfer-log-consumer":  "See various log consumers.",
+        "slepic/http-transfer-observer-implementation": "See various observer implementations."
+    },
     "minimum-stability": "stable",
     "require-dev": {
         "phpunit/phpunit": "~5.0",
