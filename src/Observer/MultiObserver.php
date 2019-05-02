@@ -25,7 +25,7 @@ class MultiObserver implements ObserverInterface
      */
     public function __construct($observers)
     {
-        if (!\is_array($observers) || !$observers instanceof \Traversable) {
+        if (!\is_array($observers) && !$observers instanceof \Traversable) {
             throw new \Exception('Expected array or iterator.');
         }
         $this->observers = $observers;

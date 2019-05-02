@@ -24,7 +24,7 @@ class MultiObserverDelegate implements ObserverDelegateInterface
      */
     public function __construct($delegates)
     {
-        if (!\is_array($delegates) || !$delegates instanceof \Traversable) {
+        if (!\is_array($delegates) && !$delegates instanceof \Traversable) {
             throw new \Exception('Expected array or iterator.');
         }
         $this->delegates = $delegates;
