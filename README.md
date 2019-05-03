@@ -92,3 +92,22 @@ foreach ($storage as $log) {
   //...
 }
 ```
+
+## Packagist Providers
+
+* [```slepic/http-transfer-log-consumer```](https://packagist.org/providers/slepic/http-transfer-log-consumer) - consumers of LogInterface
+* [```slepic/http-transfer-observer-consumer```](https://packagist.org/providers/slepic/http-transfer-observer-consumer) - consumers of ObserverInterface and ObserverDelegateInterface
+* [```slepic/http-transfer-observer-implementation```](https://packagist.org/providers/slepic/http-transfer-observer-implementation) - implementations of ObserverInterface and ObserverDelegateInterface.
+
+If you use this library in a public project and you use composer and share the project on packagist, consider adding the packagist providers above to your composer.json like this:
+
+```
+"provide": {
+  "slepic/http-transfer-*-consumer": "*", //if you created a consumer of correspoding interface(s)
+  "slepic/http-transfer-*-implementation": "*" //if you created implementation of corresponding interface(s)
+},
+"suggest": {
+  "slepic/http-transfer-*-consumer": "*",  //if you created implementation of corresponding interface(s)
+  "slepic/http-transfer-*-implementation": "*" //if you created a consumer of correspoding interface(s)
+}
+```
