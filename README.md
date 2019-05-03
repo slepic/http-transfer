@@ -10,12 +10,85 @@ There are 3 components at this moment:
 
 ### Log
 
-Simple structure holing the request, response, error, time of start and end of the transfer.
+This component consists of:
+* interface [```Slepic\Http\Transfer\Log\LogInterface```](https://github.com/slepic/http-transfer/blob/master/src/Log/LogInterface.php) defining a simple structure holing the request, response, error, time of start and end of the transfer.
+  * and its implementation [```Slepic\Http\Transfer\Log\Log```](https://github.com/slepic/http-transfer/blob/master/src/Log/Log.php)
+* interface [```Slepic\Http\Transfer\Log\StorageInterface```](https://github.com/slepic/http-transfer/blob/master/src/Log/StorageInterface.php) which is used to store the logs.
+  * and of course its simple implementation [```Slepic\Http\Transfer\Log\ArrayStorage```](https://github.com/slepic/http-transfer/blob/master/src/Log/ArrayStorage.php) which stores the logs in array.
+
+```
+$storage = new ArrayStorage();
+$storage->store(new Log($request, $start, $end, $response, $exception, $context));
+assert($storage[0]->getRequest() === $request);
+assert($storage[0]->getResponse() === $response);
+assert($storage[0]->getException() === $exception);
+assert($storage[0]->getStartTime() === $start);
+assert($storage[0]->getEndTime() === $end);
+assert($storage[0]->getContext() === $context);
+```
 
 ### Observer
 
 An abstraction over the transfer process where the observer is notified about start and end of transfer processes.
 
+The observation is provided by the [```Slepic\Http\Transfer\Observer\ObserverInterface```](https://github.com/slepic/http-transfer/blob/master/src/Observer/ObserverInterface.php) which is in fact just a factory.
+
+The observer takes the initiating request and returns a one use object implementing [```Slepic\Http\Transfer\Observer\ObserverDelegateInterface```](https://github.com/slepic/http-transfer/blob/master/src/Observer/ObserverDelegateInterface.php).
+
+The delegate is destined to be notified of either success or failure of the transfer, and then it gets destroyed by garbage collector.
+
+```
+$observer = new SomeImplementationOfObserverInterface();
+$delegate = $observer->observe($request, $context);
+
+//process the $request
+//...
+//got $response ...
+
+$delegate->success($response);
+
+//or maybe got network exception
+$delegate->error($exception);
+
+//or maybe some client like guzzle throw exceptions for HTTP 4xx and 5xx when the response object exists along the exception
+$delegate->error($exception, $exception instanceof GuzzleException ? $exception->getResponse() : null);
+```
+
 ### History
 
 A coposition of the two above that implements the osbserver to create the logs with duration information.
+
+This one contains just an implementation of the [```Slepic\Http\Transfer\Observer\ObserverInterface```](https://github.com/slepic/http-transfer/blob/master/src/Observer/ObserverInterface.php).
+
+The [```Slepic\Http\Transfer\History\HistoryObserver```](https://github.com/slepic/http-transfer/blob/master/src/History/HistoryObserver.php) pushes transfer logs to a storage as they get completed.
+
+Well of course the job is actualy done by its delegate [```Slepic\Http\Transfer\History\HistoryObserverDelegate```](https://github.com/slepic/http-transfer/blob/master/src/History/HistoryObserverDelegate.php)
+
+
+```
+//create services
+$storage = new ArrayStorage();
+$observer = new HistoryObserver($storage);
+
+
+//somewhere you send some requests
+foreach ($requests as $request) {his 
+  $delegate = $observer->observe($request);
+  try {
+    $response = $client->sendRequest($request);
+  } catch (\Exception $e) {
+    $delegate->error($e);
+    throw $e;
+  }
+  $delegate->success($response);
+}
+
+
+//and when u need it you can access transfer logs
+foreach ($storage as $log) {
+  var_dump($log->getRequest());
+  var_dump($log->getResponse());
+  var_dump($log->getEndTime() - $log->getStartTime());
+  //...
+}
+```
