@@ -1,8 +1,8 @@
 <?php
 
-
 namespace Slepic\Tests\Http\Transfer\Observer;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -12,9 +12,6 @@ use Slepic\Http\Transfer\Observer\ObserverDelegateInterface;
 use Slepic\Http\Transfer\Observer\ObserverInterface;
 
 /**
- * Class MultiObserverTest
- * @package Slepic\Tests\Http\Transfer\Observer
- *
  * This is actually test case for both MultiObserver and MultiObserverDelegate.
  */
 class MultiObserverTest extends TestCase
@@ -22,10 +19,10 @@ class MultiObserverTest extends TestCase
     /**
      * Tests that MultiObserver::observe calls all contained observers and returns MultiObserverDelegate instance.
      *
-     * @param $delegates
+     * @param iterable $delegates
      * @dataProvider provideData
      */
-    public function testObserve($delegates)
+    public function testObserve(iterable $delegates): void
     {
         $request = $this->createMock(RequestInterface::class);
         $options = [\md5(\time()) => \md5(\time())];
@@ -35,7 +32,7 @@ class MultiObserverTest extends TestCase
             $observer->expects($this->once())
                 ->method('observe')
                 ->with($request, $options)
-                ->willReturn($delegate);
+                ->willReturn($this->delegate($delegate));
             $observers[$key] = $observer;
         }
         $observer = new MultiObserver($observers);
@@ -48,10 +45,10 @@ class MultiObserverTest extends TestCase
      * Tests that MultiObserver::observe calls all contained observers and returns MultiObserverDelegate instance
      * while working with Iterator of observers rather then an array.
      *
-     * @param $delegates
+     * @param iterable $delegates
      * @dataProvider provideData
      */
-    public function testObserveIterator($delegates)
+    public function testObserveIterator(iterable $delegates): void
     {
         $request = $this->createMock(RequestInterface::class);
         $options = [\md5(\time()) => \md5(\time())];
@@ -61,7 +58,7 @@ class MultiObserverTest extends TestCase
             $observer->expects($this->once())
                 ->method('observe')
                 ->with($request, $options)
-                ->willReturn($delegate);
+                ->willReturn($this->delegate($delegate));
             $observers[$key] = $observer;
         }
         $observer = new MultiObserver($observers);
@@ -72,15 +69,16 @@ class MultiObserverTest extends TestCase
 
     /**
      * Tests that MultiObserverDelegate::success calls all contained delegates.
-     *
-     * @param $delegates
-     * @dataProvider provideData
      */
-    public function testSuccess($delegates)
+    public function testSuccess(): void
     {
+        $delegates = [
+            $this->createMock(ObserverDelegateInterface::class),
+            $this->createMock(ObserverDelegateInterface::class),
+        ];
         $response = $this->createMock(ResponseInterface::class);
-        foreach ($delegates as $key => $delegate) {
-            $delegate->expects($this->once())
+        foreach ($delegates as $delegate) {
+            $delegate->expects($this->exactly(1))
                 ->method('success')
                 ->with($response);
         }
@@ -91,16 +89,16 @@ class MultiObserverTest extends TestCase
 
     /**
      * Tests that MultiObserverDelegate::error calls all contained delegates.
-     *
-     * @param $delegates
-     * @throws \Exception
-     * @dataProvider provideData
      */
-    public function testError($delegates)
+    public function testError(): void
     {
+        $delegates = [
+            $this->createMock(ObserverDelegateInterface::class),
+            $this->createMock(ObserverDelegateInterface::class),
+        ];
         $exception = new \Exception();
         $response = $this->createMock(ResponseInterface::class);
-        foreach ($delegates as $key => $delegate) {
+        foreach ($delegates as $delegate) {
             $delegate->expects($this->once())
                 ->method('error')
                 ->with($exception, $response);
@@ -116,10 +114,10 @@ class MultiObserverTest extends TestCase
      * Kinda repeats previous tests, but it is only way to test that all delegates are passed to MultiObserverDelegate
      * without having it expose that list, or accessing it through reflection.
      *
-     * @param $delegates
+     * @param iterable $delegates
      * @dataProvider provideData
      */
-    public function testAllDelegatesPassed($delegates)
+    public function testAllDelegatesPassed(iterable $delegates): void
     {
         $exception = new \Exception();
         $response = $this->createMock(ResponseInterface::class);
@@ -127,6 +125,7 @@ class MultiObserverTest extends TestCase
         $options = [\md5(\time()) => \md5(\time())];
         $observers = [];
         foreach ($delegates as $key => $delegate) {
+            $delegate = $this->delegate($delegate);
             $observer = $this->createMock(ObserverInterface::class);
             $observer->expects($this->once())
                 ->method('observe')
@@ -151,36 +150,43 @@ class MultiObserverTest extends TestCase
         $delegate->error($exception, $response);
     }
 
-    /**
-     * @return array
-     */
-    public function provideData()
+    public function provideData(): array
     {
         return [
             [[]],
             [
                 [
-                    $this->createMock(ObserverDelegateInterface::class),
+                    $this->mockDelegate(),
                 ],
             ],
             [
                 [
-                    $this->createMock(ObserverDelegateInterface::class),
-                    $this->createMock(ObserverDelegateInterface::class),
+                    $this->mockDelegate(),
+                    $this->mockDelegate(),
                 ],
             ],
 
             //test that MultiObserverDelegate can work with iterators
             [
                 new \ArrayIterator([
-                    $this->createMock(ObserverDelegateInterface::class),
+                    $this->mockDelegate(),
                 ]),
             ],
             [
                 new \ArrayObject([
-                    $this->createMock(ObserverDelegateInterface::class),
+                    $this->mockDelegate(),
                 ]),
             ],
         ];
+    }
+
+    private function mockDelegate(): \Closure
+    {
+        return fn () => $this->createMock(ObserverDelegateInterface::class);
+    }
+
+    private function delegate(MockObject|\Closure $delegate): MockObject
+    {
+        return $delegate instanceof \Closure ? $delegate() : $delegate;
     }
 }

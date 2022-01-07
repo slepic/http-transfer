@@ -15,7 +15,7 @@ $output = \array_map(function ($item) {
     return new \SplFileInfo($item);
 }, $output);
 
-$config = PhpCsFixer\Config::create();
+$config = new PhpCsFixer\Config();
 $config->setFinder($output);
 
 if (\count($output) > 0) {

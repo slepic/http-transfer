@@ -3,47 +3,31 @@
 namespace Slepic\Http\Transfer\Log;
 
 /**
- * Class ArrayStorage
- * @package Slepic\Http\Transfer\Log
- *
  * Simple implementation of StorageInterface that allows to read the logs through an IteratorAggregate.
  */
 class ArrayStorage implements StorageInterface, \IteratorAggregate, \Countable, \ArrayAccess
 {
-    /**
-     * @var \ArrayObject
-     */
-    private $logs;
+    private \ArrayObject $logs;
 
-    /**
-     * ArrayStorage constructor.
-     * @param array|\ArrayAccess|null $storage
-     */
-    public function __construct($storage = [])
+    public function __construct(array|\ArrayAccess $storage = [])
     {
         $this->logs = new \ArrayObject($storage);
     }
 
-    /**
-     * @param LogInterface $log
-     */
-    public function store(LogInterface $log)
+    public function store(LogInterface $log): void
     {
         $this->logs[] = $log;
     }
 
     /**
-     * @return \Iterator
+     * @return \Iterator<LogInterface>
      */
-    public function getIterator()
+    public function getIterator(): \Iterator
     {
         return $this->logs->getIterator();
     }
 
-    /**
-     * @return int
-     */
-    public function count()
+    public function count(): int
     {
         return \count($this->logs);
     }
@@ -52,7 +36,7 @@ class ArrayStorage implements StorageInterface, \IteratorAggregate, \Countable, 
      * @param int $offset
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->logs[$offset]);
     }
@@ -61,7 +45,7 @@ class ArrayStorage implements StorageInterface, \IteratorAggregate, \Countable, 
      * @param int $offset
      * @return LogInterface|null
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): ?LogInterface
     {
         return $this->logs[$offset];
     }
@@ -71,7 +55,7 @@ class ArrayStorage implements StorageInterface, \IteratorAggregate, \Countable, 
      * @param LogInterface $value
      * @throws \Exception
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if ($offset !== null) {
             throw new \Exception('Logs can only be appended.');
@@ -79,7 +63,7 @@ class ArrayStorage implements StorageInterface, \IteratorAggregate, \Countable, 
         $this->store($value);
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw new \BadMethodCallException('Cannot unset logs.');
     }

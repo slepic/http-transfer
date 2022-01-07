@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Slepic\Tests\Http\Transfer;
 
 use PHPUnit\Framework\TestCase;
@@ -46,10 +45,11 @@ class ExampleTest extends TestCase
         $this->assertSame($response, $log->getResponse());
         $this->assertSame($exception, $log->getException());
         $this->assertSame($context, $log->getContext());
-        $this->assertInternalType('float', $log->getStartTime());
-        $this->assertInternalType('float', $log->getEndTime());
+        $this->assertIsFloat($log->getStartTime());
+        $this->assertIsFloat($log->getEndTime());
         $this->assertTrue($log->getStartTime() < $log->getEndTime());
-        $this->assertEquals($time / 1000000.0, $log->getEndTime() - $log->getStartTime(), '', 0.001);
+        $this->assertGreaterThan($time / 1000000.0 - 0.001, $log->getEndTime() - $log->getStartTime());
+        $this->assertLessThan($time / 1000000.0 + 0.001, $log->getEndTime() - $log->getStartTime());
     }
 
     private function transfer(
