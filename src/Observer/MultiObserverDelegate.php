@@ -1,50 +1,29 @@
 <?php
 
-
 namespace Slepic\Http\Transfer\Observer;
 
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Class MultiObserverDelegate
- * @package Slepic\Http\Transfer\Observer
- *
  * Allows multiple observers to be processed at the same time.
  */
 class MultiObserverDelegate implements ObserverDelegateInterface
 {
     /**
-     * @var ObserverDelegateInterface[]|\Traversable
+     * @param iterable<ObserverDelegateInterface> $delegates
      */
-    private $delegates;
-
-    /**
-     * MultiObserverDelegate constructor.
-     * @param ObserverDelegateInterface[]|\Traversable $delegates
-     */
-    public function __construct($delegates)
+    public function __construct(private iterable $delegates)
     {
-        if (!\is_array($delegates) && !$delegates instanceof \Traversable) {
-            throw new \Exception('Expected array or iterator.');
-        }
-        $this->delegates = $delegates;
     }
 
-    /**
-     * @param ResponseInterface $response
-     */
-    public function success(ResponseInterface $response)
+    public function success(ResponseInterface $response): void
     {
         foreach ($this->delegates as $delegate) {
             $delegate->success($response);
         }
     }
 
-    /**
-     * @param \Exception $exception
-     * @param ResponseInterface|null $response
-     */
-    public function error(\Exception $exception, ResponseInterface $response = null)
+    public function error(\Throwable $exception, ?ResponseInterface $response = null): void
     {
         foreach ($this->delegates as $delegate) {
             $delegate->error($exception, $response);

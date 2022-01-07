@@ -1,14 +1,10 @@
 <?php
 
-
 namespace Slepic\Http\Transfer\Observer;
 
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Class AbstractObserverDelegate
- * @package Slepic\Http\Transfer\Observer
- *
  * This abstract class expects implementors to implement the protected finish() method
  * to complete the observation the same way for both success and error states.
  */
@@ -19,7 +15,7 @@ abstract class AbstractObserverDelegate implements ObserverDelegateInterface
      *
      * @param ResponseInterface $response
      */
-    final public function success(ResponseInterface $response)
+    final public function success(ResponseInterface $response): void
     {
         $this->finish($response);
     }
@@ -30,7 +26,7 @@ abstract class AbstractObserverDelegate implements ObserverDelegateInterface
      * @param \Exception $exception
      * @param ResponseInterface|null $response
      */
-    final public function error(\Exception $exception, ResponseInterface $response = null)
+    final public function error(\Throwable $exception, ?ResponseInterface $response = null): void
     {
         $this->finish($response, $exception);
     }
@@ -46,5 +42,5 @@ abstract class AbstractObserverDelegate implements ObserverDelegateInterface
      * @param \Exception|null $exception
      * @return void
      */
-    abstract protected function finish(ResponseInterface $response = null, \Exception $exception = null);
+    abstract protected function finish(?ResponseInterface $response = null, ?\Throwable $exception = null): void;
 }
