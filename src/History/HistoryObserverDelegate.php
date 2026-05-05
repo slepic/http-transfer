@@ -20,7 +20,7 @@ final class HistoryObserverDelegate extends AbstractObserverDelegate
         $this->startTime = \microtime(true);
     }
 
-    protected function finish(?ResponseInterface $response = null, \Throwable $exception = null): void
+    protected function finish(?ResponseInterface $response = null, ?\Throwable $exception = null): void
     {
         $log = new Log(
             $this->request,
